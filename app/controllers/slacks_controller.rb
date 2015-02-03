@@ -27,12 +27,15 @@ class SlacksController < ApplicationController
 			message = "You are now inactive.  You must challenge at rank #{current_rank} in order to come back."
 		when 'ranking'
 			players  = Player.where('status = 1 AND rank > 0').order('rank')
-			i = 1
 			message = ''
-			players.each do |player|
-				message = message + "Rank #{player.rank} is #{player.name}! :mushroom: 
-				"
-				i = i + 1
+			players.each_with_index do |player, index|
+				extra_thing = ':mushroom:'
+				if(index < 3)
+					extra_thing = ':trophy:'
+				end
+
+				message = message + "#{player.rank}. #{player.name}#{extra_thing}
+"
 			end
 		when 'challenge'
 			from_user = Player.find_by(:name => params[:user_name])
@@ -157,18 +160,22 @@ class SlacksController < ApplicationController
 					message = "Challenge sent to @#{player_to_challenge.name} for rank #{player_to_challenge.rank}.  Good luck!"
 				end
 			end
+		when 'meow'
+			message = "http://lorempixel.com/400/400/cats/"
+		when 'meow2'
+			message = 'http://imashon.com/wp-content/uploads/2014/12/Meow-Cute-Cat.jpg'
 		when 'help'
 			message = "Available commands:\n
-						add_me - adds you to the ladder\n
-						kill_me - removes you from the ladder\n
-						im_afk - removes you from the ladder temporarily\n
-						im_back - brings you back from being off the ladder, and automatically issues a challenge to whoever is in your spot\n
-						ranking - shows you the ladder\n
-						challenge [name] ex: 'challenge ryo'- issues a challenge\n
-						accept - accept a challenge\n
-						decline - decline a challenge, you will be taken off the ladder and you have to say 'im_back'\n
-						i_won - declares victory\n
-						i_lost - declares your epic failure\n
+						*add_me* - adds you to the ladder\n
+						*kill_me* - removes you from the ladder\n
+						*im_afk* - removes you from the ladder temporarily\n
+						*im_back* - brings you back from being off the ladder, and automatically issues a challenge to whoever is in your spot\n
+						*ranking* - shows you the ladder\n
+						*challenge [name] ex: 'challenge ryo'- issues a challenge\n
+						*accept* - accept a challenge\n
+						*decline* - decline a challenge, you will be taken off the ladder and you have to say 'im_back'\n
+						*i_won* - declares victory\n
+						*i_lost* - declares your epic failure\n
 			"
 		else
 			message = "I don't understand you meow. Hint: type 'help'"
@@ -178,7 +185,7 @@ class SlacksController < ApplicationController
 			message = ''
 		end
 
-		render :json => {:text=>message}, :status=>201
+		render :json => {:text=>message, :mrkdwn => true}, :status=>201
 	end
 
 
