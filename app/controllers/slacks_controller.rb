@@ -26,11 +26,11 @@ class SlacksController < ApplicationController
 			deactivate(player)
 			message = "You are now inactive.  You must challenge at rank #{current_rank} in order to come back."
 		when 'ranking'
-			players  = Player.where('status = 1 AND rank > 0').order('rank')
+			players  = Player.where('status != -1 AND rank > 0').order('rank')
 			message = ''
 			players.each_with_index do |player, index|
 				extra_thing = ':mushroom:'
-				if(index < 3)
+				if(player.rank < 3)
 					extra_thing = ':trophy:'
 				end
 
