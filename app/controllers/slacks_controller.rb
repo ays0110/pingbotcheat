@@ -4,13 +4,23 @@ class SlacksController < ApplicationController
 		command = params[:text].split[0]
 		body = params[:text].split[1]
 		user = params[:user_name]
+		message = ''
 
 		case command
-		when 'what is on?'
+		when 'whats_on'
 			unacceptedchallenges = Challenge.where(:status=>0)
 			activematches = Challenge.where(:status=>1)
 			unacceptedchallenges.each do |challenge|
-
+				message = message + ":speech_balloon: Waiting on #{Player.find(challenge.to_id).name} to accept #{Player.find(challenge.from_id).name}'s challenge
+				"
+			end
+			activematches.each do |match|
+				message = message + ":pingpong: Waiting on #{Player.find(match.to_id).name} and #{Player.find(match.from_id).name}'s match to finish
+				"
+			end
+			if message == ''
+				message = "Nothing's on, maybe you should start something! :dizzy:"
+			end
 		when 'add me'
 			max_rank = Player.maximum('rank') || 0
 			if Player.exists?(:name => params[:user_name])
@@ -170,7 +180,7 @@ class SlacksController < ApplicationController
 		when 'meow2'
 			message = 'http://imashon.com/wp-content/uploads/2014/12/Meow-Cute-Cat.jpg'
 		when 'help'
-			message = "Available commands:\n
+			message = "Available commands: :collision:\n
 						*add_me* - adds you to the ladder\n
 						*kill_me* - removes you from the ladder\n
 						*im_afk* - removes you from the ladder temporarily\n
@@ -181,6 +191,7 @@ class SlacksController < ApplicationController
 						*decline* - decline a challenge, you will be taken off the ladder and you have to say 'im_back'\n
 						*i_won* - declares victory\n
 						*i_lost* - declares your epic failure\n
+						*whats_on* - shows all open challenges and matches\n
 			"
 		else
 			message = "I don't understand you meow. Hint: type 'help'"
