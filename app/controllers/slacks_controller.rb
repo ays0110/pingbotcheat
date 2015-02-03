@@ -17,9 +17,9 @@ class SlacksController < ApplicationController
 		when 'kill_me'
 			player = Player.find_by(:name => params[:user_name])
 			player.destroy if !player.blank?
-			message = "I killed #{params[:user_name]}" if !player.blank?
+			message = "I killed #{params[:user_name]}, muahahahaha :knife: :syringe:" if !player.blank?
 			message = "Couldn't find player" if player.blank?
-			self.rerank
+			self.rerank(nil)
 		when 'im_afk'
 			player = Player.find_by(:name => params[:user_name])
 			current_rank = player.rank
@@ -30,7 +30,7 @@ class SlacksController < ApplicationController
 			i = 1
 			message = ''
 			players.each do |player|
-				message = message + "Rank #{player.rank} is #{player.name}! "
+				message = message + "Rank #{player.rank} is #{player.name}! /n :mushroom: "
 				i = i + 1
 			end
 		when 'challenge'
