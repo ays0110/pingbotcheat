@@ -6,17 +6,17 @@ class SlacksController < ApplicationController
 		user = params[:user_name]
 		message = ''
 
-		case command
+		case command.downcase
 		when 'whats_on'
 			unacceptedchallenges = Challenge.where(:status=>0)
 			activematches = Challenge.where(:status=>1)
 			unacceptedchallenges.each do |challenge|
 				message = message + ":speech_balloon: Waiting on #{Player.find(challenge.to_id).name} to accept #{Player.find(challenge.from_id).name}'s challenge
-				"
+"
 			end
 			activematches.each do |match|
 				message = message + ":pingpong: Waiting on #{Player.find(match.to_id).name} and #{Player.find(match.from_id).name}'s match to finish
-				"
+"
 			end
 			if message == ''
 				message = "Nothing's on, maybe you should start something! :dizzy:"
@@ -159,20 +159,20 @@ class SlacksController < ApplicationController
 
 				message = "Match complete. @#{winning_user.name} won, ranking #{Player.find(winning_user.id).rank}. @#{losing_user.name} lost, ranking #{Player.find(losing_user.id).rank}"
 			else
-				message = 'You are not in an active match right now.  Either accept one, or challenge someone'
+				message = 'You are not in an active match right now.  Either accept one, or challenge someone! '
 			end
 
 		when 'im_back'
 			user = Player.find_by(:name => params[:user_name])
 			if user.status != -1
-				message = "What are you talking about? You were never away!"
+				message = "What are you talking about? You were never away! :anger:"
 			else
 				player_to_challenge = Player.find_by(:rank=>user.last_rank)
 				if player_to_challenge.status != 1
-					message = "You need to challenge #{player_to_challenge.name} to get your rank back, but they are already challenged or playing.  Try again later!"
+					message = "You need to challenge #{player_to_challenge.name} to get your rank back, but they are already challenged or playing.  Try again later! :sweat_drops:"
 				else
 					Challenge.create(:to_id=>player_to_challenge.id, :from_id=>user.id, :status => 0)
-					message = "Challenge sent to @#{player_to_challenge.name} for rank #{player_to_challenge.rank}.  Good luck!"
+					message = "Challenge sent to @#{player_to_challenge.name} for rank #{player_to_challenge.rank}.  Good luck! :four_leaf_clover:"
 				end
 			end
 		when 'meow'
