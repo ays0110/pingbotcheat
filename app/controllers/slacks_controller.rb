@@ -21,7 +21,7 @@ class SlacksController < ApplicationController
 			if message == ''
 				message = "Nothing's on, maybe you should start something! :dizzy:"
 			end
-		when 'add me'
+		when 'add_me'
 			max_rank = Player.maximum('rank') || 0
 			if Player.exists?(:name => params[:user_name])
 				message = "You're already on the ladder foo'!"
@@ -29,13 +29,13 @@ class SlacksController < ApplicationController
 				Player.create(:name => params[:user_name], :status=> 1, :rank=> max_rank+1)
 				message = "Player #{params[:user_name]} added with rank #{max_rank+1}"
 			end
-		when 'kill me'
+		when 'kill_me'
 			player = Player.find_by(:name => params[:user_name])
 			player.destroy if !player.blank?
 			message = "I killed #{params[:user_name]}, muahahahaha :knife: :syringe:" if !player.blank?
 			message = "Couldn't find player" if player.blank?
 			self.rerank(nil)
-		when 'im afk'
+		when 'im_afk'
 			player = Player.find_by(:name => params[:user_name])
 			current_rank = player.rank
 			deactivate(player)
@@ -194,7 +194,7 @@ class SlacksController < ApplicationController
 						*whats_on* - shows all open challenges and matches\n
 			"
 		else
-			message = "I don't understand you meow. Hint: type 'help'"
+			message = ''
 		end
 
 		if user == 'slackbot'
