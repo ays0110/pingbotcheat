@@ -6,7 +6,12 @@ class SlacksController < ApplicationController
 		user = params[:user_name]
 
 		case command
-		when 'add_me'
+		when 'what is on?'
+			unacceptedchallenges = Challenge.where(:status=>0)
+			activematches = Challenge.where(:status=>1)
+			unacceptedchallenges.each do |challenge|
+
+		when 'add me'
 			max_rank = Player.maximum('rank') || 0
 			if Player.exists?(:name => params[:user_name])
 				message = "You're already on the ladder foo'!"
@@ -14,13 +19,13 @@ class SlacksController < ApplicationController
 				Player.create(:name => params[:user_name], :status=> 1, :rank=> max_rank+1)
 				message = "Player #{params[:user_name]} added with rank #{max_rank+1}"
 			end
-		when 'kill_me'
+		when 'kill me'
 			player = Player.find_by(:name => params[:user_name])
 			player.destroy if !player.blank?
 			message = "I killed #{params[:user_name]}, muahahahaha :knife: :syringe:" if !player.blank?
 			message = "Couldn't find player" if player.blank?
 			self.rerank(nil)
-		when 'im_afk'
+		when 'im afk'
 			player = Player.find_by(:name => params[:user_name])
 			current_rank = player.rank
 			deactivate(player)
@@ -30,7 +35,7 @@ class SlacksController < ApplicationController
 			message = ''
 			players.each_with_index do |player, index|
 				extra_thing = ':mushroom:'
-				if(player.rank < 3)
+				if(player.rank < 4)
 					extra_thing = ':trophy:'
 				end
 
