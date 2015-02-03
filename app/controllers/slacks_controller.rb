@@ -30,7 +30,8 @@ class SlacksController < ApplicationController
 			i = 1
 			message = ''
 			players.each do |player|
-				message = message + "Rank #{player.rank} is #{player.name}! /n :mushroom: "
+				message = message + "Rank #{player.rank} is #{player.name}! :mushroom: 
+				"
 				i = i + 1
 			end
 		when 'challenge'
