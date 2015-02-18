@@ -19,7 +19,7 @@ class SlacksController < ApplicationController
 "
 			end
 			if message == ''
-				message = "Nothing's on, maybe you should start something! :dizzy:"
+				message = "Meow ma mia! :pizza: Nothing's on, maybe you should start something! :dizzy:"
 			end
 		when 'add_me'
 			max_rank = Player.maximum('rank') || 0
@@ -37,9 +37,13 @@ class SlacksController < ApplicationController
 			self.rerank(nil)
 		when 'im_afk'
 			player = Player.find_by(:name => params[:user_name])
-			current_rank = player.rank
-			deactivate(player)
-			message = "You are now inactive.  You must challenge at rank #{current_rank} in order to come back."
+			if player.status == 1
+				current_rank = player.rank
+				deactivate(player)
+				message = "Meow ma mia! :pizza: You are inactive.  Use im_back to challenge at rank #{current_rank} to come back."
+			else
+				message = "Gnocchi! :pizza: You must finish all challenges or matches before you can leave! Use decline or i_lost!"
+			end
 		when 'ranking'
 			players  = Player.where('status != -1 AND rank > 0').order('rank')
 			message = ''
@@ -57,19 +61,19 @@ class SlacksController < ApplicationController
 			to_user = Player.find_by(:name => body)
 
 			if from_user.blank?
-				message = "You are not a ping pong player"
+				message = "Gnocchi! :pizza: You are not a ping pong player"
 			elsif to_user.blank?
-				message = "#{body} is not a ping pong player"
+				message = "Gnocchi! :pizza: #{body} is not a ping pong player"
 			elsif from_user.status == 0
-				message = "You cannot issue a challenge because you are already in a challenge or match"
+				message = "Gnocchi! :pizza: You cannot challenge because you are already in a challenge or match"
 			elsif from_user.status == -1
-				message = "You cannot issue a challenge because you are inactive, type im_back to get back on the ranking first"
+				message = "Gnocchi! :pizza: You cannot challenge because you are inactive, type im_back to get back on the ranking first"
 			elsif to_user.status == 0
-				message = "#{to_user.name} is already in a challenge or match"
+				message = "Gnocchi! :pizza: #{to_user.name} is already in a challenge or match"
 			elsif to_user.status == -1
-				message = "#{to_user.name} is not active right now.  They are OOO or injured, take it easy."
+				message = "Gnocchi! :pizza: #{to_user.name} is not active right now.  They are OOO or injured, take it easy."
 			elsif ([to_user.rank, from_user.rank].max - [to_user.rank, from_user.rank].min) > 2
-				message = "Challenge not valid, ranking difference is more than 2"
+				message = "Gnocchi! :pizza: Challenge not valid, ranking difference is more than 2"
 			elsif from_user.status == 1 && to_user.status ==1
 				challenge = Challenge.create(:from_id => from_user.id, :to_id=>to_user.id, :status=> 0)
 				from_user.update(:status=>0)
@@ -80,22 +84,22 @@ class SlacksController < ApplicationController
 		when 'accept'
 			user = Player.find_by(:name => params[:user_name])
 			if user.blank?
-				message = "You are not a ping pong player"
+				message = "Meow-ma mia :pizza: You are not a ping pong player"
 			else
 				challenge = Challenge.where(:to_id => user.id, :status=>0).first
 				if challenge
 					from_user = Player.find(challenge.from_id)
 					challenge.update(:status=>1)
-					message = "Challenge from @#{from_user.name} accepted, go play"
+					message = "Challenge from @#{from_user.name} accepted, go play :pizza:"
 				else
-					message = "No active challenges to you found"
+					message = "Meow-ma mia :pizza: No active challenges to you found"
 				end
 			end
 
 		when 'decline'
 			user = Player.find_by(:name => params[:user_name])
 			if user.blank?
-				message = "You are not a ping pong player"
+				message = "Gnocchi! :pizza: You are not a ping pong player"
 			else
 				challenge = Challenge.where(:to_id => user.id, :status=>0).first
 				if challenge
@@ -105,9 +109,9 @@ class SlacksController < ApplicationController
 					challenge.update(:status=>-1)
 					from_user.update(:status=>1)
 					deactivate(to_user)
-					message = "Challenge from @#{from_user.name} declined, you are now off the ranking.  You must challenge at #{last_rank} to get back.  Type im_back when you're ready"
+					message = "Meow-ma mia :pizza: Challenge from @#{from_user.name} declined, you are now off the ranking.  You must challenge at #{last_rank} to get back.  Type im_back when you're ready"
 				else
-					message = "No active challenges to you found"
+					message = "Meow-ma mia :pizza: No active challenges to you found"
 				end
 			end
 
@@ -159,20 +163,20 @@ class SlacksController < ApplicationController
 
 				message = "Match complete. @#{winning_user.name} won, ranking #{Player.find(winning_user.id).rank}. @#{losing_user.name} lost, ranking #{Player.find(losing_user.id).rank}"
 			else
-				message = 'You are not in an active match right now.  Either accept one, or challenge someone! '
+				message = 'Gnocchi! :pizza: You are not in an active match right now.  Either accept one, or challenge someone! '
 			end
 
 		when 'im_back'
 			user = Player.find_by(:name => params[:user_name])
 			if user.status != -1
-				message = "What are you talking about? You were never away! :anger:"
+				message = "Gnocchi! :pizza: What are you talking about? You were never away! :anger:"
 			else
 				player_to_challenge = Player.find_by(:rank=>user.last_rank)
 				if player_to_challenge.status != 1
-					message = "You need to challenge #{player_to_challenge.name} to get your rank back, but they are already challenged or playing.  Try again later! :sweat_drops:"
+					message = "Meow-ma mia :pizza: You need to challenge #{player_to_challenge.name} to get your rank back, but they are already challenged or playing.  Try again later! :sweat_drops:"
 				else
 					Challenge.create(:to_id=>player_to_challenge.id, :from_id=>user.id, :status => 0)
-					message = "Challenge sent to @#{player_to_challenge.name} for rank #{player_to_challenge.rank}.  Good luck! :four_leaf_clover:"
+					message = "Challenge sent to @#{player_to_challenge.name} for rank #{player_to_challenge.rank}.  Good luck! :four_leaf_clover: :pizza:"
 				end
 			end
 		when 'meow'
