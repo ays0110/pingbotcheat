@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   resources :players
 
   resources :challenges
+  post '/reset' => 'challenges#reset'
 
   post '/slack' => 'slacks#respond'
   # The priority is based upon order of creation: first created -> highest priority.
