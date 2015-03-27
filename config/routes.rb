@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   post '/reset' => 'challenges#reset'
 
   post '/slack' => 'slacks#respond'
+  get '/ranking' => 'application#ranking'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
