@@ -57,7 +57,8 @@ class SlacksController < ApplicationController
 "
 			end
 		when 'challenge'
-			from_user = Player.find_by(:name => params[:user_name])
+			from_username = params[:user_name].gsub(/@/, '')
+			from_user = Player.find_by(:name => from_username)
 			to_user = Player.find_by(:name => body)
 
 			if from_user.blank?
@@ -78,7 +79,7 @@ class SlacksController < ApplicationController
 				challenge = Challenge.create(:from_id => from_user.id, :to_id=>to_user.id, :status=> 0)
 				from_user.update(:status=>0)
 				to_user.update(:status=>0)
-				message = "Challenge to #{to_user.name} issued. @#{to_user.name}, you are challenged by @#{params[:user_name]}"
+				message = "Challenge to #{to_user.name} issued. @#{to_user.name}, you are challenged by @#{from_username}"
 			end
 
 		when 'accept'
